@@ -13,6 +13,9 @@ mod benchmarking;
 
 type IdType = Vec<u8>;
 type HashType = Vec<u8>;
+type ModelName = Vec<u8>;
+type ActionName = Vec<u8>;
+type Payload = Vec<u8>;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -45,14 +48,9 @@ pub mod pallet {
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		/// Event documentation should end with an array that provides descriptive names for event
-		/// parameters. [who, something, time]
-		SectionCreate(T::AccountId, Section, u64),
-		SectionUpdate(T::AccountId, Section, u64),
-		SectionDelete(T::AccountId, IdType, u64),
-		ArticleCreate(T::AccountId, Article, u64),
-		ArticleUpdate(T::AccountId, Article, u64),
-		ArticleDelete(T::AccountId, IdType, u64),
+		/// [who, model, action, payload, time]
+		Action(T::AccountId, ModelName, ActionName, Payload, u64),
+		IndexUpdated(T::AccountId, ModelName, ActionName, Payload, u64),
 	}
 
 	#[pallet::error]
@@ -65,31 +63,39 @@ pub mod pallet {
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		/// An example dispatchable that takes a singles value as a parameter, writes the value to
-		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn do_something(origin: OriginFor<T>, something: u32) -> DispatchResult {
+		pub fn action(origin: OriginFor<T>, model: ModelName, action: ActionName, payload: Payload) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
-			<Something<T>>::put(something);
-
-			Self::deposit_event(Event::SomethingStored(something, who));
+            let block_time = get_the_block_time();
+            // In this call function, we do nothing now, excepting emitting the event back
+            // This trick is to record the original requests from users to the blocks,
+            // but not record it to the on-chain storage.
+			Self::deposit_event(Event::Action(who, model, action, payload, block_time));
 			Ok(())
 		}
 
-		/// An example dispatchable that may throw a custom error.
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
-		pub fn cause_error(origin: OriginFor<T>) -> DispatchResult {
+		pub fn index_update(origin: OriginFor<T>, model: ModelName, id: IdType, hash: HashType) -> DispatchResult {
 			let _who = ensure_signed(origin)?;
 
-			match <Something<T>>::get() {
-				None => return Err(Error::<T>::NoneValue.into()),
-				Some(old) => {
-					let new = old.checked_add(1).ok_or(Error::<T>::StorageOverflow)?;
-					<Something<T>>::put(new);
-					Ok(())
-				},
-			}
+            let block_time = get_the_block_time();
+
+            // Write the id-hash pair into each StorageMap, according to the model name
+            match model {
+                "section".as_bytes() => {
+
+                }
+                "article".as_bytes() => {
+                
+                }
+            }
+
+            let action = "index_update".as_bytes();
+            let payload = "".as_bytes();
+
+			Self::deposit_event(Event::IndexUpdated(who, model, action, payload, block_time));
+			Ok(())
 		}
 	}
 }
