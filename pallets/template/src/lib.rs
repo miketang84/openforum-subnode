@@ -1,6 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::traits::UnixTime;
 
 pub use pallet::*;
 
@@ -13,19 +12,24 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
-type IdType = Vec<u8>;
-type HashType = Vec<u8>;
-type ModelName = Vec<u8>;
-type ActionName = Vec<u8>;
-type Payload = Vec<u8>;
 
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 
+    use frame_support::inherent::Vec;
+    use frame_support::traits::UnixTime;
+    
+    type IdType = Vec<u8>;
+    type HashType = Vec<u8>;
+    type ModelName = Vec<u8>;
+    type ActionName = Vec<u8>;
+    type Payload = Vec<u8>;
+
 	#[pallet::pallet]
 	#[pallet::generate_store(pub(super) trait Store)]
+    #[pallet::without_storage_info]
 	pub struct Pallet<T>(_);
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
@@ -41,8 +45,8 @@ pub mod pallet {
 	//pub type Something<T> = StorageValue<_, u32>;
 
     #[pallet::storage]
-    pub(super) type ModelIdHashDoubleMap=
-        StorageMap<_, Blake2_128Concat, ModelName, Blake2_128Concat, IdType, HashType, ValueQuery>;
+    pub(super) type ModelIdHashDoubleMap<T: Config> =
+        StorageDoubleMap<_, Blake2_128Concat, ModelName, Blake2_128Concat, IdType, HashType, ValueQuery>;
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -82,18 +86,22 @@ pub mod pallet {
             let block_time: u64 = T::TimeProvider::now().as_secs();
 
             // Write the id-hash pair into each StorageMap, according to the model name
-            ModelIdHashDoubleMap<T>::set(model, id, hash);
+            ModelIdHashDoubleMap::<T>::set(model.clone(), id.clone(), hash.clone());
 
-            let action = "index_update".as_bytes();
-            let payload = format!("{id},{hash}").as_bytes();
+            let action = "index_update".as_bytes().to_vec();
+            let mut payload: Payload = Vec::new();
+            payload.append(&mut id.clone());
+            payload.push(b',');
+            payload.append(&mut hash.clone());
 
 			Self::deposit_event(Event::IndexUpdated(who, model, action, payload, block_time));
 			Ok(())
 		}
 	}
+
+    // work implementation
+    //impl<T: Config> Pallet<T> {
+    //
+    //}
 }
 
-// work implementation
-//impl<T: Config> Pallet<T> {
-//
-//}
