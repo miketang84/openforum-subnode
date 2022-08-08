@@ -38,12 +38,8 @@ pub mod pallet {
 	//pub type Something<T> = StorageValue<_, u32>;
 
     #[pallet::storage]
-    pub(super) type IdHashMapSection =
-        StorageMap<_, Blake2_128Concat, IdType, HashType, ValueQuery>;
-
-    #[pallet::storage]
-    pub(super) type IdHashMapArticle =
-        StorageMap<_, Blake2_128Concat, IdType, HashType, ValueQuery>;
+    pub(super) type ModelIdHashDoubleMap=
+        StorageMap<_, Blake2_128Concat, ModelName, Blake2_128Concat, IdType, HashType, ValueQuery>;
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -82,17 +78,10 @@ pub mod pallet {
             let block_time = get_the_block_time();
 
             // Write the id-hash pair into each StorageMap, according to the model name
-            match model {
-                "section".as_bytes() => {
-
-                }
-                "article".as_bytes() => {
-                
-                }
-            }
+            ModelIdHashDoubleMap<T>::set(model, id, hash);
 
             let action = "index_update".as_bytes();
-            let payload = "".as_bytes();
+            let payload = format!("{id},{hash}").as_bytes();
 
 			Self::deposit_event(Event::IndexUpdated(who, model, action, payload, block_time));
 			Ok(())
