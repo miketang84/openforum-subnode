@@ -1,5 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use frame_support::traits::UnixTime;
+
 pub use pallet::*;
 
 #[cfg(test)]
@@ -31,6 +33,7 @@ pub mod pallet {
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+        type TimeProvider: UnixTime;
 	}
 
 	//#[pallet::storage]
@@ -63,7 +66,8 @@ pub mod pallet {
 		pub fn action(origin: OriginFor<T>, model: ModelName, action: ActionName, payload: Payload) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
-            let block_time = get_the_block_time();
+            let block_time: u64 = T::TimeProvider::now().as_secs();
+
             // In this call function, we do nothing now, excepting emitting the event back
             // This trick is to record the original requests from users to the blocks,
             // but not record it to the on-chain storage.
@@ -73,9 +77,9 @@ pub mod pallet {
 
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn index_update(origin: OriginFor<T>, model: ModelName, id: IdType, hash: HashType) -> DispatchResult {
-			let _who = ensure_signed(origin)?;
+			let who = ensure_signed(origin)?;
 
-            let block_time = get_the_block_time();
+            let block_time: u64 = T::TimeProvider::now().as_secs();
 
             // Write the id-hash pair into each StorageMap, according to the model name
             ModelIdHashDoubleMap<T>::set(model, id, hash);
@@ -88,3 +92,8 @@ pub mod pallet {
 		}
 	}
 }
+
+// work implementation
+//impl<T: Config> Pallet<T> {
+//
+//}
