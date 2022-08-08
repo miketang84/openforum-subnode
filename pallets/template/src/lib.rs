@@ -46,13 +46,13 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// Event documentation should end with an array that provides descriptive names for event
-		/// parameters. [who, something]
-		SectionCreate(T::AccountId, Section),
-		SectionUpdate(T::AccountId, Section),
-		SectionDelete(T::AccountId, IdType),
-		ArticleCreate(T::AccountId, Article),
-		ArticleUpdate(T::AccountId, Article),
-		ArticleDelete(T::AccountId, IdType),
+		/// parameters. [who, something, time]
+		SectionCreate(T::AccountId, Section, u64),
+		SectionUpdate(T::AccountId, Section, u64),
+		SectionDelete(T::AccountId, IdType, u64),
+		ArticleCreate(T::AccountId, Article, u64),
+		ArticleUpdate(T::AccountId, Article, u64),
+		ArticleDelete(T::AccountId, IdType, u64),
 	}
 
 	#[pallet::error]
