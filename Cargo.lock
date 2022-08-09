@@ -3874,6 +3874,7 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
  "hex-literal",
+ "openforum-runtime-api",
  "pallet-aura",
  "pallet-balances",
  "pallet-grandpa",
@@ -3897,6 +3898,15 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "substrate-wasm-builder",
+]
+
+[[package]]
+name = "openforum-runtime-api"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "serde_json",
+ "sp-api",
 ]
 
 [[package]]

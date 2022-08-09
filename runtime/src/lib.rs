@@ -464,6 +464,15 @@ impl_runtime_apis! {
 		}
 	}
 
+
+    // The runtime api from openforum module
+    impl openforum_runtime_api::OpenForumApi<Block> for Runtime {
+		fn check_pair_list(model: Vec<u8>, list: Vec<(Vec<u8>, Vec<u8>)>) -> bool {
+            OpenForumModule::check_pair_list(model, list)
+        }
+    }
+
+
 	#[cfg(feature = "runtime-benchmarks")]
 	impl frame_benchmarking::Benchmark<Block> for Runtime {
 		fn benchmark_metadata(extra: bool) -> (

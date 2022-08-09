@@ -101,7 +101,7 @@ pub mod pallet {
 
     // Work implementation
     impl<T: Config> Pallet<T> {
-        pub fn check_id_hash_pair(model: ModelName, pair_list: Vec<(IdType, HashType)>) -> bool {
+        pub fn check_pair_list(model: ModelName, pair_list: Vec<(IdType, HashType)>) -> bool {
             for (id, hash) in pair_list {
                 let index_hash = ModelIdHashDoubleMap::<T>::get(&model, id);
                 if index_hash != hash {

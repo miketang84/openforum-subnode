@@ -1,12 +1,13 @@
 [package]
-name = "openforum-subnode-runtime-api"
+name = "openforum-runtime-api"
 version = "0.1.0"
 authors = ['Mike Tang <daogangtang@gmail.com>']
 edition = "2018"
 license = "GPL-3.0-or-later"
 
 [dependencies]
-sp-api = { version = '3.0', default-features = false}
+sp-api = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.26" }
+frame-support = { default-features = false, version = "4.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.26"}
 
 [dev-dependencies]
 serde_json = "1.0"
@@ -15,4 +16,5 @@ serde_json = "1.0"
 default = ["std"]
 std = [
 	"sp-api/std",
+	"frame-support/std",
 ]
