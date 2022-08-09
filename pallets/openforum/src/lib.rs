@@ -99,9 +99,18 @@ pub mod pallet {
 		}
 	}
 
-    // work implementation
-    //impl<T: Config> Pallet<T> {
-    //
-    //}
+    // Work implementation
+    impl<T: Config> Pallet<T> {
+        pub fn check_id_hash_pair(model: ModelName, pair_list: Vec<(IdType, HashType)>) -> bool {
+            for (id, hash) in pair_list {
+                let index_hash = ModelIdHashDoubleMap::<T>::get(&model, id);
+                if index_hash != hash {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
 }
 

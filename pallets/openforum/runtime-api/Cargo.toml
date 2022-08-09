@@ -1,0 +1,18 @@
+[package]
+name = "openforum-subnode-runtime-api"
+version = "0.1.0"
+authors = ['Mike Tang <daogangtang@gmail.com>']
+edition = "2018"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+sp-api = { version = '3.0', default-features = false}
+
+[dev-dependencies]
+serde_json = "1.0"
+
+[features]
+default = ["std"]
+std = [
+	"sp-api/std",
+]
