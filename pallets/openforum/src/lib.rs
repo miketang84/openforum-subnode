@@ -51,7 +51,7 @@ pub mod pallet {
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		/// [who, model, action, payload, time]
+		/// [who, model, action, data, time]
 		Action(T::AccountId, ModelName, ActionName, Payload, u64),
 		IndexUpdated(T::AccountId, ModelName, ActionName, Payload, u64),
 	}
