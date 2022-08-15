@@ -67,7 +67,7 @@ pub mod pallet {
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn action(origin: OriginFor<T>, model: ModelName, action: ActionName, payload: Payload) -> DispatchResult {
+		pub fn passby(origin: OriginFor<T>, model: ModelName, action: ActionName, payload: Payload) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
             let block_time: u64 = T::TimeProvider::now().as_secs();
@@ -80,7 +80,7 @@ pub mod pallet {
 		}
 
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
-		pub fn index_update(origin: OriginFor<T>, model: ModelName, id: IdType, hash: HashType) -> DispatchResult {
+		pub fn update_index(origin: OriginFor<T>, model: ModelName, id: IdType, hash: HashType) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
             let block_time: u64 = T::TimeProvider::now().as_secs();
