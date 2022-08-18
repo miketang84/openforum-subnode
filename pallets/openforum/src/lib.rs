@@ -67,7 +67,7 @@ pub mod pallet {
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn passby(origin: OriginFor<T>, model: ModelName, action: ActionName, payload: Payload) -> DispatchResult {
+		pub fn act(origin: OriginFor<T>, model: ModelName, action: ActionName, payload: Payload) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
             let block_time: u64 = T::TimeProvider::now().as_secs();
