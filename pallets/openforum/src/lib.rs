@@ -80,7 +80,7 @@ pub mod pallet {
 		}
 
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
-		pub fn update_index(origin: OriginFor<T>, model: ModelName, id: IdType, hash: HashType) -> DispatchResult {
+		pub fn update_index(origin: OriginFor<T>, model: ModelName, reqid: Payload, id: IdType, hash: HashType) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
             let block_time: u64 = T::TimeProvider::now().as_secs();
@@ -90,9 +90,11 @@ pub mod pallet {
 
             let action = "index_update".as_bytes().to_vec();
             let mut payload: Payload = Vec::new();
-            payload.append(&mut id.clone());
-            payload.push(b',');
-            payload.append(&mut hash.clone());
+            payload.append(&mut reqid);
+            payload.push(b':');
+            payload.append(&mut id);
+            payload.push(b':');
+            payload.append(&mut hash);
 
 			Self::deposit_event(Event::IndexUpdated(who, model, action, payload, block_time));
 			Ok(())
