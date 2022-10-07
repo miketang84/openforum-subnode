@@ -90,11 +90,11 @@ pub mod pallet {
 
             let action = "index_update".as_bytes().to_vec();
             let mut payload: Payload = Vec::new();
-            payload.append(&mut reqid);
+            payload.extend_from_slice(&reqid);
             payload.push(b':');
-            payload.append(&mut id);
+            payload.extend_from_slice(&id);
             payload.push(b':');
-            payload.append(&mut hash);
+            payload.extend_from_slice(&hash);
 
 			Self::deposit_event(Event::IndexUpdated(who, model, action, payload, block_time));
 			Ok(())
