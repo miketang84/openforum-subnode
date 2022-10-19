@@ -48,12 +48,22 @@ pub mod pallet {
     pub(super) type ModelIdHashDoubleMap<T: Config> =
         StorageDoubleMap<_, Blake2_128Concat, ModelName, Blake2_128Concat, IdType, HashType, ValueQuery>;
 
+    #[pallet::storage]
+    #[pallet::getter(fn wasm_file)]
+    pub(super) type WasmFile = StorageValue<_, Vec<u8>, ValueQuery>;
+
+    #[pallet::storage]
+    #[pallet::getter(fn wasm_file_new_flag)]
+    pub(super) type WasmFileNewFlag = StorageValue<_, bool, ValueQuery>;
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// [who, model, action, data, time]
 		Action(T::AccountId, ModelName, ActionName, Payload, u64),
 		IndexUpdated(T::AccountId, ModelName, ActionName, Payload, u64),
+		Upgrade(T::AccountId, bool, u64),
+		DisableUpgrade(T::AccountId, bool, u64),
 	}
 
 	#[pallet::error]
@@ -97,6 +107,39 @@ pub mod pallet {
             payload.extend_from_slice(&hash);
 
 			Self::deposit_event(Event::IndexUpdated(who, model, action, payload, block_time));
+			Ok(())
+		}
+
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
+		pub fn wasm_upgrade(origin: OriginFor<T>, wasm_file: Vec<u8>) -> DispatchResult {
+			let who = ensure_root(origin)?;
+
+            let block_time: u64 = T::TimeProvider::now().as_secs();
+
+            // update new wasm file content
+            WasmFile::set(wasm_file);
+            // update new flag
+            WasmFileNewFlag::set(true);
+
+            // In this call function, we do nothing now, excepting emitting the event back
+            // This trick is to record the original requests from users to the blocks,
+            // but not record it to the on-chain storage.
+			Self::deposit_event(Event::Upgrade(who, true, block_time));
+			Ok(())
+		}
+
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
+		pub fn disable_wasm_upgrade_flag(origin: OriginFor<T>) -> DispatchResult {
+			let who = ensure_root(origin)?;
+
+            let block_time: u64 = T::TimeProvider::now().as_secs();
+
+            WasmFileNewFlag::set(false);
+
+            // In this call function, we do nothing now, excepting emitting the event back
+            // This trick is to record the original requests from users to the blocks,
+            // but not record it to the on-chain storage.
+			Self::deposit_event(Event::DisableUpgrade(who, true, block_time));
 			Ok(())
 		}
 	}
