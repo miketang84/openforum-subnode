@@ -50,11 +50,11 @@ pub mod pallet {
 
     #[pallet::storage]
     #[pallet::getter(fn wasm_file)]
-    pub(super) type WasmFile = StorageValue<_, Vec<u8>, ValueQuery>;
+    pub(super) type WasmFile<T: Config> = StorageValue<_, Vec<u8>, ValueQuery>;
 
     #[pallet::storage]
     #[pallet::getter(fn wasm_file_new_flag)]
-    pub(super) type WasmFileNewFlag = StorageValue<_, bool, ValueQuery>;
+    pub(super) type WasmFileNewFlag<T: Config> = StorageValue<_, bool, ValueQuery>;
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -112,14 +112,15 @@ pub mod pallet {
 
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn wasm_upgrade(origin: OriginFor<T>, wasm_file: Vec<u8>) -> DispatchResult {
-			let who = ensure_root(origin)?;
+			//let who = ensure_root(origin)?;
+			let who = ensure_signed(origin)?;
 
             let block_time: u64 = T::TimeProvider::now().as_secs();
 
             // update new wasm file content
-            WasmFile::set(wasm_file);
+            WasmFile::<T>::set(wasm_file);
             // update new flag
-            WasmFileNewFlag::set(true);
+            WasmFileNewFlag::<T>::set(true);
 
             // In this call function, we do nothing now, excepting emitting the event back
             // This trick is to record the original requests from users to the blocks,
@@ -130,16 +131,17 @@ pub mod pallet {
 
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn disable_wasm_upgrade_flag(origin: OriginFor<T>) -> DispatchResult {
-			let who = ensure_root(origin)?;
+			//let who = ensure_root(origin)?;
+			let who = ensure_signed(origin)?;
 
             let block_time: u64 = T::TimeProvider::now().as_secs();
 
-            WasmFileNewFlag::set(false);
+            WasmFileNewFlag::<T>::set(false);
 
             // In this call function, we do nothing now, excepting emitting the event back
             // This trick is to record the original requests from users to the blocks,
             // but not record it to the on-chain storage.
-			Self::deposit_event(Event::DisableUpgrade(who, true, block_time));
+			Self::deposit_event(Event::DisableUpgrade(who, false, block_time));
 			Ok(())
 		}
 	}
